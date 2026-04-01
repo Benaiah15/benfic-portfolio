@@ -9,10 +9,14 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [projects, setProjects] = useState([]);
   const [visitors, setVisitors] = useState(0); 
-  const [chartData, setChartData] = useState([]); // Added state for the graph
+  const [chartData, setChartData] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
 
-  // Form State
+  // --- Profile Photo State ---
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+  const [profileData, setProfileData] = useState<any>(null);
+
+  // Form State for Projects
   const [editingId, setEditingId] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
@@ -20,7 +24,7 @@ export default function AdminDashboard() {
   const [liveLink, setLiveLink] = useState("");
   const [processText, setProcessText] = useState("");
   const [image, setImage] = useState<File | null>(null);
-  const [processImage1, setProcessImage1] = useState<File | null>(null);
+  const [processImage1, setProcessImage1] = useState<File | null>(0);
   const [processImage2, setProcessImage2] = useState<File | null>(null);
 
   // Security Check & Initial Fetch
@@ -30,6 +34,7 @@ export default function AdminDashboard() {
     } else {
       fetchProjects();
       fetchStats();
+      fetchProfile(); // Fetch your "About Me" data
     }
   }, []);
 
@@ -49,10 +54,20 @@ export default function AdminDashboard() {
       const data = await res.json();
       if (data.success) {
         setVisitors(data.total);
-        setChartData(data.chartData); // Save the 7-day data to state
+        setChartData(data.chartData);
       }
     } catch (error) {
       console.error("Failed to fetch stats", error);
+    }
+  };
+
+  const fetchProfile = async () => {
+    try {
+      const res = await fetch("/api/profile");
+      const data = await res.json();
+      if (data.success) setProfileData(data.data);
+    } catch (error) {
+      console.error("Failed to fetch profile", error);
     }
   };
 
@@ -70,6 +85,33 @@ export default function AdminDashboard() {
     });
   };
 
+  // Handle Profile Photo Upload
+  const handleProfileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUpdatingProfile(true);
+    try {
+      const base64 = await toBase64(file);
+      const res = await fetch("/api/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ profileImageUrl: base64 }),
+      });
+
+      if (res.ok) {
+        alert("About Me photo updated successfully!");
+        fetchProfile();
+      } else {
+        alert("Failed to update profile photo.");
+      }
+    } catch (error) {
+      alert("Error uploading photo.");
+    } finally {
+      setIsUpdatingProfile(false);
+    }
+  };
+
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsUploading(true);
@@ -78,8 +120,8 @@ export default function AdminDashboard() {
       const payload: any = { title, category, description, liveLink, processText };
       
       if (image) payload.imageUrl = await toBase64(image);
-      if (processImage1) payload.processImage1 = await toBase64(processImage1);
-      if (processImage2) payload.processImage2 = await toBase64(processImage2);
+      if (processImage1 instanceof File) payload.processImage1 = await toBase64(processImage1);
+      if (processImage2 instanceof File) payload.processImage2 = await toBase64(processImage2);
 
       const method = editingId ? "PUT" : "POST";
       const url = editingId ? `/api/projects/${editingId}` : "/api/projects";
@@ -146,7 +188,6 @@ export default function AdminDashboard() {
 
   const isWebCategory = category === "Web Development" || category === "Wordpress Development";
 
-  // Custom styling for the Recharts Tooltip popup
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -186,6 +227,28 @@ export default function AdminDashboard() {
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-6xl">
             <h2 className="text-3xl font-bold mb-8">Dashboard Overview</h2>
             
+            {/* PROFILE PHOTO MANAGEMENT */}
+            <div className="bg-zinc-900/50 border border-zinc-800 p-6 rounded-2xl mb-8 flex flex-col sm:flex-row items-center gap-6">
+               <div className="w-24 h-24 rounded-full bg-zinc-800 border-2 border-benfic-blue overflow-hidden flex-shrink-0">
+                  {profileData?.profileImageUrl ? (
+                    <img src={profileData.profileImageUrl} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-zinc-600 text-xs">No Photo</div>
+                  )}
+               </div>
+               <div className="flex-1">
+                 <h3 className="text-lg font-bold text-white mb-2">About Me Photo</h3>
+                 <p className="text-sm text-zinc-400 mb-4">This photo will appear on your public About page.</p>
+                 <input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleProfileUpload} 
+                    className="block w-full text-sm text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-benfic-blue file:text-white hover:file:bg-blue-600 cursor-pointer"
+                  />
+                  {isUpdatingProfile && <p className="text-xs text-benfic-blue mt-2 animate-pulse">Updating image in database...</p>}
+               </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <div className="bg-zinc-900/50 border border-zinc-800 p-6 rounded-2xl">
                 <p className="text-zinc-400 text-sm mb-1">Total Visitors All-Time</p>
@@ -202,7 +265,7 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* THE NEW ANALYTICS CHART */}
+            {/* THE ANALYTICS CHART */}
             <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 h-[400px]">
               <h3 className="text-lg font-bold text-white mb-6">Traffic Over Last 7 Days</h3>
               {chartData.length > 0 ? (
