@@ -41,3 +41,37 @@
 .animation-delay-4000 {
   animation-delay: 4s;
 }
+
+/* 3. NEW: Cool Page Fade-In Animation */
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-page-fade {
+  animation: pageFadeIn 0.6s ease-out forwards;
+}
+
+/* 4. NEW: Custom Premium Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #09090b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #0452DA;
+}
