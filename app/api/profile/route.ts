@@ -16,7 +16,7 @@ export async function PUT(req: Request) {
   try {
     await connectToDatabase();
     const body = await req.json();
-    // Updates the single profile document or creates it if missing (upsert)
+    // Body now contains bioExcerpt and fullBio
     const profile = await Profile.findOneAndUpdate({}, body, { upsert: true, new: true });
     return NextResponse.json({ success: true, data: profile });
   } catch (error) {
