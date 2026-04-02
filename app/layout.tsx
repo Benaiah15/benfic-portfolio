@@ -4,7 +4,8 @@ import "./globals.css";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import VisitorTracker from "../components/VisitorTracker";
-import DynamicLoader from "../components/DynamicLoader"; // New client component for detection
+import DynamicLoader from "../components/DynamicLoader"; 
+import { Suspense } from "react"; // <-- Added this import
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,8 +22,11 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body className={`${inter.className} bg-zinc-950 text-white antialiased flex flex-col min-h-screen`}>
-        {/* The cool flashy middle-screen overlay loader */}
-        <DynamicLoader /> 
+        
+        {/* We wrap the loader in Suspense to fix the Vercel Build Error */}
+        <Suspense fallback={null}>
+          <DynamicLoader /> 
+        </Suspense>
         
         <VisitorTracker />
         <Navbar />
