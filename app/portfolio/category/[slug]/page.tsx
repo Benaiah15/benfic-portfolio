@@ -29,7 +29,11 @@ export default async function CategoryPage({
   if (!categoryName) {
     return (
       <div className="min-h-screen bg-zinc-950 flex items-center justify-center text-white">
-        <h1 className="text-3xl font-bold">Category Not Found</h1>
+        <div className="text-center">
+            <h1 className="text-5xl font-black text-benfic-blue mb-4">404</h1>
+            <h2 className="text-2xl font-bold">Category Not Found</h2>
+            <Link href="/portfolio" className="mt-6 inline-block text-zinc-400 hover:text-white transition-colors">← Back to Portfolio</Link>
+        </div>
       </div>
     );
   }
@@ -59,6 +63,7 @@ export default async function CategoryPage({
 
   return (
     <div className="flex flex-col min-h-screen text-white bg-zinc-950 relative">
+      {/* Assuming your PageHero takes title and span. Adjust if your component is different */}
       <PageHero title={categoryName.split(' ')[0]} span={categoryName.split(' ').slice(1).join(' ')} />
 
       <section className="py-20 px-6 lg:px-8 max-w-7xl mx-auto w-full z-10 relative">
@@ -85,7 +90,7 @@ export default async function CategoryPage({
           </div>
         )}
 
-        <div className="flex justify-between items-end mb-10">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-10 gap-4">
             <h2 className="text-2xl font-bold text-white">
                 {currentFilter === "All" ? "All Projects" : currentFilter} <span className="text-zinc-500 text-lg font-medium">({projects.length})</span>
             </h2>
