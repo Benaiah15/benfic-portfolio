@@ -11,7 +11,7 @@ export default function AdminDashboard() {
 
   // --- STATS/TRAFFIC STATE ---
   const [statsData, setStatsData] = useState<any>(null);
-  const [statsTimeframe, setStatsTimeframe] = useState(7); // default 7 days
+  const [statsTimeframe, setStatsTimeframe] = useState(7);
   const [visitors, setVisitors] = useState(0); 
   const [chartData, setChartData] = useState<any[]>([]);
 
@@ -35,26 +35,19 @@ export default function AdminDashboard() {
   const [problemSolved, setProblemSolved] = useState("");
   const [solutionText, setSolutionText] = useState("");
   const [processBreakdown, setProcessBreakdown] = useState("");
-  const [processImageFiles, setProcessImageFiles] = useState<FileList | null>(null); // Multiple upload
+  const [processImageFiles, setProcessImageFiles] = useState<FileList | null>(null);
 
   // --- NEW DYNAMIC FIELDS STATE ---
-  
-  // WEB/WORDPRESS Mockups (resizable placeholders supported via Base64)
   const [laptopViewFile, setLaptopViewFile] = useState<File | null>(null);
   const [tabletViewFile, setTabletViewFile] = useState<File | null>(null);
   const [mobileViewFile, setMobileViewFile] = useState<File | null>(null);
   
-  // Web Technologies list
-  const [technologiesUsed, setTechnologiesUsed] = useState(""); // Comma separated input: "Next.js, React, Tailwind"
-  
-  // WP Theme/Plugins lists
+  const [technologiesUsed, setTechnologiesUsed] = useState(""); 
   const [wpThemeUsed, setWpThemeUsed] = useState("");
-  const [wpPluginsUsed, setWpPluginsUsed] = useState(""); // Comma separated list
+  const [wpPluginsUsed, setWpPluginsUsed] = useState(""); 
   
-  // GRAPHICS Subcategory
-  const [graphicDesignType, setGraphicDesignType] = useState(""); // under which section to add the design
+  const [graphicDesignType, setGraphicDesignType] = useState(""); 
 
-  // Security Check & Initial Fetch
   useEffect(() => {
     if (!sessionStorage.getItem("tab_auth")) {
       signOut({ callbackUrl: "/admin/login" });
@@ -65,7 +58,6 @@ export default function AdminDashboard() {
     }
   }, []);
   
-  // Stats fetch needs to re-run when timeframe changes
   useEffect(() => {
     fetchStats();
   }, [statsTimeframe]);
@@ -103,7 +95,6 @@ export default function AdminDashboard() {
       const res = await fetch("/api/category-config");
       const data = await res.json();
       if (data.success) {
-        // We ensure all 4 categories exist, if DB doesn't have them, we initialize defaults
         const requiredCategories = ["Web Development", "Wordpress Development", "UI/UX Design", "Graphic Design"];
         const existingData = data.data;
         
@@ -125,20 +116,17 @@ export default function AdminDashboard() {
     });
   };
   
-  // Helper for multiple file Base64 conversion
   const multiToBase64 = async (files: FileList | null): Promise<string[]> => {
     if (!files || files.length === 0) return [];
     const filesArray = Array.from(files);
     return Promise.all(filesArray.map(file => toBase64(file)));
   };
 
-  // Helper for comma separated strings to arrays
   const stringToArray = (str: string): string[] => {
     if (!str) return [];
     return str.split(',').map(item => item.trim()).filter(item => item !== "");
   };
 
-  // --- UPDATE PROFILE AND CONFIGS HANDLERS ---
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsUpdatingProfile(true);
@@ -148,7 +136,6 @@ export default function AdminDashboard() {
         fullBio: (form.elements.namedItem("fullBio") as HTMLTextAreaElement).value,
     };
     
-    // photo handled separately to keep profile API PUT call simple text
     const fileInput = (form.elements.namedItem("profileImageUrl") as HTMLInputElement).files?.[0];
     if (fileInput) {
         formData.profileImageUrl = await toBase64(fileInput);
@@ -172,17 +159,15 @@ export default function AdminDashboard() {
     e.preventDefault();
     setIsUpdatingConfigs(true);
     
-    // We convert images of categoryConfigs to Base64 *immediately* here before sending
     const updatedConfigsWithBase64 = await Promise.all(categoryConfigs.map(async (config: any, index: number) => {
         const fileInputId = `featuredImageUrl_${index}`;
         const fileInput = document.getElementById(fileInputId) as HTMLInputElement;
         const file = fileInput.files?.[0];
         
-        let newBase64 = config.featuredImageUrl; // Default to existing
+        let newBase64 = config.featuredImageUrl; 
         if (file) {
             newBase64 = await toBase64(file);
         }
-        
         return { ...config, featuredImageUrl: newBase64 };
     }));
     
@@ -210,16 +195,9 @@ export default function AdminDashboard() {
         problemSolved, solutionText, processBreakdown 
       };
       
-      // Mandatory cover image for creation, optional for update
       if (coverImage) payload.imageUrl = await toBase64(coverImage);
-      
-      // multiple process images
-      if (processImageFiles) {
-        payload.processImages = await multiToBase64(processImageFiles);
-      }
+      if (processImageFiles) payload.processImages = await multiToBase64(processImageFiles);
 
-      // --- CONDITIONAL DYNAMIC FIELDS UPLOADS ---
-      
       const isWebWP = category === "Web Development" || category === "Wordpress Development";
       if (isWebWP) {
         if (laptopViewFile) payload.viewLaptopImageUrl = await toBase64(laptopViewFile);
@@ -227,18 +205,12 @@ export default function AdminDashboard() {
         if (mobileViewFile) payload.viewMobileImageUrl = await toBase64(mobileViewFile);
       }
       
-      if (category === "Web Development") {
-        payload.technologiesUsed = stringToArray(technologiesUsed);
-      }
-      
+      if (category === "Web Development") payload.technologiesUsed = stringToArray(technologiesUsed);
       if (category === "Wordpress Development") {
         payload.wpThemeUsed = wpThemeUsed;
         payload.wpPluginsUsed = stringToArray(wpPluginsUsed);
       }
-      
-      if (category === "Graphic Design") {
-        payload.graphicDesignType = graphicDesignType;
-      }
+      if (category === "Graphic Design") payload.graphicDesignType = graphicDesignType;
 
       const method = editingId ? "PUT" : "POST";
       const url = editingId ? `/api/projects/${editingId}` : "/api/projects";
@@ -283,11 +255,9 @@ export default function AdminDashboard() {
     setSolutionText(project.solutionText || "");
     setProcessBreakdown(project.processBreakdown || "");
     
-    // Clear dynamic files inputs
     setCoverImage(null); setProcessImageFiles(null);
     setLaptopViewFile(null); setTabletViewFile(null); setMobileViewFile(null);
     
-    // Set dynamic text inputs based on category
     setTechnologiesUsed(project.technologiesUsed?.join(', ') || "");
     setWpThemeUsed(project.wpThemeUsed || "");
     setWpPluginsUsed(project.wpPluginsUsed?.join(', ') || "");
@@ -322,7 +292,7 @@ export default function AdminDashboard() {
       {/* SIDEBAR */}
       <aside className="w-full md:w-64 bg-zinc-900/50 border-r border-zinc-800 p-6 flex flex-col">
         <div className="mb-10 text-center">
-          <h1 className="text-2xl font-bold">TRUST <span className="text-benfic-blue">STUDIO</span></h1>
+          <h1 className="text-2xl font-bold">BEN<span className="text-benfic-blue">FIC</span></h1>
           <p className="text-zinc-500 text-xs mt-1 tracking-wider">CREATIVE DASHBOARD</p>
         </div>
 
@@ -370,8 +340,7 @@ export default function AdminDashboard() {
             <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-8">
                 <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg font-bold text-white">Visit Stats</h3>
-                    {/* Improvised toggle */}
-                    <div className="flex gap-2 bg-zinc-950 p-1.5 rounded-full border border-zinc-800 text-sm">
+                    <div className="flex flex-wrap gap-2 bg-zinc-950 p-1.5 rounded-full border border-zinc-800 text-sm">
                         {[
                           {val: 7, label: '7D'}, {val: 30, label: '30D'}, 
                           {val: 90, label: '3M'}, {val: 180, label: '6M'}, {val: 365, label: '1Y'}
@@ -379,7 +348,7 @@ export default function AdminDashboard() {
                             <button 
                                 key={t.val}
                                 onClick={() => setStatsTimeframe(t.val)}
-                                className={`px-4 py-1.5 rounded-full transition-colors ${statsTimeframe === t.val ? 'bg-benfic-blue text-white' : 'text-zinc-500 hover:bg-zinc-800 hover:text-white'}`}
+                                className={`px-3 py-1.5 sm:px-4 rounded-full transition-colors ${statsTimeframe === t.val ? 'bg-benfic-blue text-white' : 'text-zinc-500 hover:bg-zinc-800 hover:text-white'}`}
                             >
                                 {t.label}
                             </button>
@@ -413,7 +382,6 @@ export default function AdminDashboard() {
             {/* Traffic Details (Country/Device) */}
             {statsData ? (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {/* Countries */}
                     <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
                         <h3 className="text-lg font-bold text-white mb-6">Top Visitor Origins (Last {statsTimeframe}D)</h3>
                         <div className="space-y-4">
@@ -426,7 +394,6 @@ export default function AdminDashboard() {
                             {statsData.countries.length === 0 && <p className="text-zinc-600 text-center py-6">No country data captured yet.</p>}
                         </div>
                     </div>
-                    {/* Devices */}
                     <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
                         <h3 className="text-lg font-bold text-white mb-6">Device Breakdown (Last {statsTimeframe}D)</h3>
                         <div className="space-y-4">
@@ -451,9 +418,8 @@ export default function AdminDashboard() {
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl">
             <h2 className="text-3xl font-bold mb-8">Site Configuration & Dynanmic Bio</h2>
             
-            {/* PROFILE/ABOUT ME SETTINGS */}
             <form onSubmit={handleProfileUpdate} className="bg-zinc-900 border border-zinc-800 p-8 rounded-3xl mb-12 space-y-6">
-                <div className="flex items-center gap-6 pb-6 border-b border-zinc-800">
+                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 pb-6 border-b border-zinc-800 text-center sm:text-left">
                   <div className="w-24 h-24 rounded-full bg-zinc-800 border-2 border-benfic-blue overflow-hidden flex-shrink-0">
                     {profileData?.profileImageUrl ? (
                       <img src={profileData.profileImageUrl} alt="Benaiah Ajibade" className="w-full h-full object-cover" />
@@ -463,7 +429,7 @@ export default function AdminDashboard() {
                   </div>
                   <div className="flex-1">
                     <h3 className="text-xl font-bold text-white mb-2">My Profile (About Me Page)</h3>
-                    <input name="profileImageUrl" type="file" accept="image/*" className="block text-sm text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-benfic-blue/20 file:text-benfic-blue hover:file:bg-benfic-blue/40 cursor-pointer" />
+                    <input name="profileImageUrl" type="file" accept="image/*" className="block w-full text-sm text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-benfic-blue/20 file:text-benfic-blue hover:file:bg-benfic-blue/40 cursor-pointer" />
                   </div>
                 </div>
 
@@ -479,12 +445,11 @@ export default function AdminDashboard() {
                     <p className="text-zinc-600 text-xs mt-1.5">This detailed bio appears exclusively on the /about page.</p>
                 </div>
 
-                <button type="submit" disabled={isUpdatingProfile} className="px-8 py-3.5 bg-benfic-blue text-white rounded-xl font-bold hover:bg-blue-600 disabled:bg-zinc-700 disabled:text-zinc-400 transition-colors">
+                <button type="submit" disabled={isUpdatingProfile} className="w-full sm:w-auto px-8 py-3.5 bg-benfic-blue text-white rounded-xl font-bold hover:bg-blue-600 disabled:bg-zinc-700 disabled:text-zinc-400 transition-colors">
                     {isUpdatingProfile ? "Uploading Bio..." : "Save Bio Settings"}
                 </button>
             </form>
 
-            {/* CATEGORY FEATURED CONFIGURATIONS */}
             <form onSubmit={handleConfigsUpdate} className="bg-zinc-900 border border-zinc-800 p-8 rounded-3xl space-y-10">
                 <h3 className="text-xl font-bold text-white pb-6 border-b border-zinc-800">Dynamic Portfolio Category Cover Pages</h3>
                 <p className="text-zinc-400 text-sm">Set the featured images and short description (cover page) for each of your four main project sections.</p>
@@ -514,7 +479,7 @@ export default function AdminDashboard() {
                                 rows={3} 
                                 className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 resize-none" 
                                 required 
-                                placeholder="Explaining what Trust Studio offers in this section (cover description)..."
+                                placeholder="Explaining what Benfic offers in this section (cover description)..."
                             />
                         </div>
                     </div>
@@ -537,18 +502,18 @@ export default function AdminDashboard() {
               ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   {projects.map((proj: any) => (
-                    <div key={proj._id} className="flex flex-col sm:flex-row items-center justify-between bg-zinc-950 p-5 rounded-2xl border border-zinc-800">
-                      <div className="flex items-center gap-4 mb-4 sm:mb-0 w-full sm:w-auto">
-                        <img src={proj.imageUrl} alt="" className="w-20 h-16 object-cover rounded-xl bg-zinc-800 border border-zinc-800" />
-                        <div>
-                          <p className="font-bold text-white">{proj.title}</p>
+                    <div key={proj._id} className="flex flex-col sm:flex-row items-center justify-between bg-zinc-950 p-5 rounded-2xl border border-zinc-800 gap-4">
+                      <div className="flex items-center gap-4 w-full sm:w-auto">
+                        <img src={proj.imageUrl} alt="" className="w-20 h-16 object-cover rounded-xl bg-zinc-800 border border-zinc-800 shrink-0" />
+                        <div className="min-w-0">
+                          <p className="font-bold text-white truncate">{proj.title}</p>
                           <p className="text-xs text-benfic-blue">{proj.category}</p>
                           {proj.graphicDesignType && <p className="text-xs text-zinc-500">{proj.graphicDesignType}</p>}
                         </div>
                       </div>
-                      <div className="flex gap-3">
-                        <button onClick={() => handleEditProject(proj)} className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm font-medium transition-colors">Edit Case Study</button>
-                        <button onClick={() => handleDeleteProject(proj._id)} className="px-4 py-2 bg-red-900/50 hover:bg-red-600 text-red-200 hover:text-white rounded-lg text-sm font-medium transition-colors">Delete</button>
+                      <div className="flex gap-3 w-full sm:w-auto shrink-0">
+                        <button onClick={() => handleEditProject(proj)} className="flex-1 sm:flex-none px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm font-medium transition-colors">Edit</button>
+                        <button onClick={() => handleDeleteProject(proj._id)} className="flex-1 sm:flex-none px-4 py-2 bg-red-900/50 hover:bg-red-600 text-red-200 hover:text-white rounded-lg text-sm font-medium transition-colors">Delete</button>
                       </div>
                     </div>
                   ))}
@@ -558,12 +523,12 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* TAB: UPLOAD / EDIT - THE COMPLEX CONDITIONAL FORM */}
+        {/* TAB: UPLOAD / EDIT */}
         {activeTab === "upload" && (
           <div className="max-w-6xl animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <h2 className="text-3xl font-bold mb-8">{editingId ? `Edit: ${title}` : "Upload New Case Study Breakdown"}</h2>
+            <h2 className="text-3xl font-bold mb-8">{editingId ? `Edit: ${title}` : "Upload New Case Study"}</h2>
             
-            <form onSubmit={handleProjectUpload} className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 space-y-6">
+            <form onSubmit={handleProjectUpload} className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 sm:p-8 space-y-6">
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-zinc-800">
                 <div>
@@ -571,7 +536,7 @@ export default function AdminDashboard() {
                   <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3.5" required placeholder="My Amazing Design" />
                 </div>
                 <div>
-                  <label className="block text-sm text-zinc-400 mb-2 font-medium">Main Category (links to page)</label>
+                  <label className="block text-sm text-zinc-400 mb-2 font-medium">Main Category</label>
                   <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3.5 appearance-none cursor-pointer" required>
                     <option value="" disabled>Select a main section</option>
                     <option value="Web Development">Web Development</option>
@@ -582,7 +547,6 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {/* COVER IMAGE & LINK */}
               <div className="grid grid-cols-1 md:grid-cols-[1fr,2fr] gap-6">
                 <div>
                     <label className="block text-sm text-zinc-400 mb-2 font-medium">Main Cover Image {editingId && "(Leave blank to keep existing)"}</label>
@@ -599,19 +563,17 @@ export default function AdminDashboard() {
                 <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={5} className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3.5 resize-none" required placeholder="Detailed backstory..."/>
               </div>
 
-              {/* PROBLEM/SOLUTION breakdown */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-zinc-800 pt-6">
                 <div>
-                  <label className="block text-sm text-zinc-400 mb-2 font-medium">The Problem (Improvise section)</label>
-                  <textarea value={problemSolved} onChange={(e) => setProblemSolved(e.target.value)} rows={4} className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3.5 resize-none" required placeholder="What was the client's challenge? (Improvise)..."/>
+                  <label className="block text-sm text-zinc-400 mb-2 font-medium">The Problem</label>
+                  <textarea value={problemSolved} onChange={(e) => setProblemSolved(e.target.value)} rows={4} className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3.5 resize-none" placeholder="What was the client's challenge?..."/>
                 </div>
                 <div>
-                  <label className="block text-sm text-zinc-400 mb-2 font-medium">The Solution (Solution Text)</label>
-                  <textarea value={solutionText} onChange={(e) => setSolutionText(e.target.value)} rows={4} className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3.5 resize-none" required placeholder="How did Trust Studio solve it? (Improvise)..."/>
+                  <label className="block text-sm text-zinc-400 mb-2 font-medium">The Solution</label>
+                  <textarea value={solutionText} onChange={(e) => setSolutionText(e.target.value)} rows={4} className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3.5 resize-none" placeholder="How did Benfic solve it?..."/>
                 </div>
               </div>
 
-              {/* PROCESS breakdown (ANY NUMBER OF IMAGES) */}
               <div className="border-t border-zinc-800 pt-6 space-y-4">
                   <h3 className="text-xl font-bold text-white">The Design/Development Process</h3>
                   <textarea value={processBreakdown} onChange={(e) => setProcessBreakdown(e.target.value)} rows={6} className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3.5 resize-none" placeholder="Explaining problem, approach, and final result breakdown..."/>
@@ -619,20 +581,13 @@ export default function AdminDashboard() {
                   <div>
                     <label className="block text-sm text-benfic-blue font-semibold mb-2">Process Images (upload ANY number of images)</label>
                     <input type="file" accept="image/*" multiple onChange={(e) => setProcessImageFiles(e.target.files)} className="w-full bg-zinc-950 text-sm border-2 border-dashed border-zinc-800 rounded-xl p-6 cursor-pointer hover:border-benfic-blue/50" />
-                    <p className="text-zinc-600 text-xs mt-1.5">Selected files will overwrite existing process images list in DB.</p>
                   </div>
               </div>
-
-              {/* ==========================================================
-                --- NEW CONDITIONAL DYNAMIC FIELDS (Detect category) ---
-                ==========================================================
-              */}
               
-              {/* IF: GRAPHIC DESIGN */}
               {category === "Graphic Design" && (
-                <div className="border-t border-benfic-blue/30 pt-6 bg-benfic-blue/5 p-6 rounded-2xl animate-in fade-in slide-in-from-top-2">
-                    <h3 className="text-xl font-bold text-benfic-blue mb-4">Graphics Section (toggled Designs Format)</h3>
-                    <label className="block text-sm text-zinc-300 mb-2 font-medium">Under which toggle section to add design? (toggledFormat)</label>
+                <div className="border-t border-benfic-blue/30 pt-6 bg-benfic-blue/5 p-6 rounded-2xl animate-in fade-in">
+                    <h3 className="text-xl font-bold text-benfic-blue mb-4">Graphics Section</h3>
+                    <label className="block text-sm text-zinc-300 mb-2 font-medium">Under which toggle section to add design?</label>
                     <select value={graphicDesignType} onChange={(e) => setGraphicDesignType(e.target.value)} className="w-full bg-zinc-950 border border-benfic-blue/40 rounded-xl px-4 py-3 appearance-none cursor-pointer" required>
                         <option value="" disabled>Select design toggle group</option>
                         <option value="My Brand Design">My Brand Design</option>
@@ -644,12 +599,9 @@ export default function AdminDashboard() {
                 </div>
               )}
 
-              {/* IF: WEB or WP (Device views) */}
               {(category === "Web Development" || category === "Wordpress Development") && (
-                <div className="border-t border-benfic-blue/30 pt-6 bg-benfic-blue/5 p-6 rounded-2xl animate-in fade-in slide-in-from-top-2 space-y-4">
+                <div className="border-t border-benfic-blue/30 pt-6 bg-benfic-blue/5 p-6 rounded-2xl animate-in fade-in space-y-4">
                     <h3 className="text-xl font-bold text-benfic-blue">Development: Device Views Breakdown</h3>
-                    <p className="text-sm text-zinc-400">Upload Base64 images featuring your project in laptop, tablet, and mobile frames.</p>
-                    
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
                             <label className="block text-sm text-zinc-300 mb-2 font-medium">Laptop View</label>
@@ -667,7 +619,6 @@ export default function AdminDashboard() {
                 </div>
               )}
               
-              {/* IF: WEB (Technologies) */}
               {category === "Web Development" && (
                 <div className="animate-in fade-in pt-4">
                     <label className="block text-sm text-zinc-400 mb-2 font-medium">Technologies Used (Comma separated)</label>
@@ -675,7 +626,6 @@ export default function AdminDashboard() {
                 </div>
               )}
               
-              {/* IF: WORDPRESS (Theme/Plugins) */}
               {category === "Wordpress Development" && (
                 <div className="animate-in fade-in space-y-4 pt-4">
                     <div>
@@ -689,7 +639,6 @@ export default function AdminDashboard() {
                 </div>
               )}
               
-              {/* IF: UI/UX (Placeholder message) */}
               {category === "UI/UX Design" && (
                 <div className="border border-benfic-blue p-6 rounded-2xl bg-benfic-blue/10 animate-in fade-in text-center">
                     <p className="font-bold text-white text-lg">UI/UX Project</p>
@@ -697,9 +646,8 @@ export default function AdminDashboard() {
                 </div>
               )}
 
-              {/* SAVE BUTTON */}
-              <button type="submit" disabled={isUploading} className="w-full bg-benfic-blue text-white font-bold py-4.5 rounded-2xl hover:bg-blue-600 transition-all mt-6 disabled:bg-blue-800 disabled:text-gray-400 text-lg shadow-[0_0_20px_rgba(4,82,218,0.3)] hover:shadow-[0_0_30px_rgba(4,82,218,0.5)]">
-                {isUploading ? "Processing complex uploads & saving to DB..." : (editingId ? "Save Breakdown Changes" : "Upload Case Study Breakdown")}
+              <button type="submit" disabled={isUploading} className="w-full bg-benfic-blue text-white font-bold py-4.5 rounded-2xl hover:bg-blue-600 transition-all mt-6 disabled:bg-blue-800 disabled:text-gray-400 text-lg shadow-[0_0_20px_rgba(4,82,218,0.3)]">
+                {isUploading ? "Processing uploads & saving..." : (editingId ? "Save Changes" : "Upload Case Study")}
               </button>
               {editingId && (
                 <button type="button" onClick={resetForm} className="w-full text-zinc-400 hover:text-white mt-4 text-sm font-medium">Cancel Edit</button>
