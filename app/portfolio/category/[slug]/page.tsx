@@ -3,6 +3,9 @@ import Project from "../../../../models/Project";
 import Link from "next/link";
 import PageHero from "../../../../components/PageHero";
 
+// Forces Next.js to fetch fresh data from the database so new uploads show instantly
+export const revalidate = 0;
+
 // Map the URL slug to the exact database category string
 const slugToCategory: Record<string, string> = {
   "graphic-design": "Graphic Design",
@@ -99,8 +102,8 @@ export default async function CategoryPage({
             </Link>
         </div>
 
-        {/* PROJECTS GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* PROJECTS GRID: Added items-start to prevent uniform row stretching */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-start">
           {projects.length === 0 ? (
             <div className="col-span-full text-center py-20 bg-zinc-900/30 rounded-3xl border border-zinc-800 border-dashed">
               <p className="text-xl text-zinc-500">No projects found in this section yet.</p>
@@ -110,22 +113,28 @@ export default async function CategoryPage({
               <Link 
                 href={`/portfolio/details/${project._id}`} 
                 key={project._id.toString()} 
-                className="group relative overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/50 backdrop-blur-sm transition-all hover:border-benfic-blue hover:shadow-[0_0_30px_rgba(4,82,218,0.2)] flex flex-col h-full"
+                // Removed h-full from the card so it snaps to content size
+                className="group relative overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/50 backdrop-blur-sm transition-all hover:border-benfic-blue hover:shadow-[0_0_30px_rgba(4,82,218,0.2)] flex flex-col"
               >
-                <div className="aspect-[4/3] w-full bg-zinc-950 overflow-hidden relative">
+                {/* Removed aspect-[4/3], added h-auto to respect natural image ratio */}
+                <div className="w-full bg-zinc-950 overflow-hidden relative h-auto">
                   {project.imageUrl ? (
                     <img 
                       src={project.imageUrl} 
                       alt={project.title} 
-                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700 ease-out"
+                      // Changed object-cover w-full h-full to object-contain w-full h-auto
+                      className="object-contain w-full h-auto block group-hover:scale-105 transition-transform duration-700 ease-out"
                     />
                   ) : (
-                    <span className="flex items-center justify-center w-full h-full text-zinc-600 font-medium">No Image</span>
+                    // Fallback block if no image is provided
+                    <div className="aspect-[4/3] flex items-center justify-center w-full bg-zinc-900 text-zinc-600 font-medium">
+                      No Image
+                    </div>
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-300"></div>
                 </div>
 
-                <div className="p-6 relative z-10 flex-grow flex flex-col">
+                <div className="p-6 relative z-10 flex flex-col h-auto">
                   {project.graphicDesignType && (
                     <span className="text-[10px] font-bold tracking-widest text-benfic-blue uppercase mb-2">
                         {project.graphicDesignType}
@@ -134,7 +143,7 @@ export default async function CategoryPage({
                   <h3 className="text-xl font-bold text-white mb-2 group-hover:text-benfic-blue transition-colors">
                     {project.title}
                   </h3>
-                  <p className="text-sm text-zinc-400 line-clamp-2">
+                  <p className="text-sm text-zinc-400 line-clamp-3">
                     {project.description}
                   </p>
                 </div>

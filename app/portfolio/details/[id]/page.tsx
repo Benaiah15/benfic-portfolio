@@ -2,6 +2,8 @@ import connectToDatabase from "../../../../lib/mongodb";
 import Project from "../../../../models/Project";
 import Link from "next/link";
 
+export const revalidate = 0;
+
 export default async function ProjectDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
   await connectToDatabase();
@@ -20,7 +22,12 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
         <div className="inline-block px-4 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-benfic-blue text-xs font-bold tracking-widest uppercase mb-6">
           {project.category} {project.graphicDesignType ? `• ${project.graphicDesignType}` : ""}
         </div>
-        <h1 className="text-4xl md:text-6xl font-black mb-6 leading-tight">{project.title}</h1>
+        
+        {/* FIX 1: Added break-words, whitespace-normal, and max-w-full to prevent long titles from extending the screen */}
+        <h1 className="text-4xl md:text-6xl font-black mb-6 leading-tight break-words whitespace-normal max-w-full">
+            {project.title}
+        </h1>
+        
         <p className="text-lg text-zinc-400 max-w-3xl mx-auto leading-relaxed whitespace-pre-wrap">
           {project.description}
         </p>
@@ -31,10 +38,11 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         
-        {/* 2. COVER IMAGE LEFT, PROBLEM/SOLUTION RIGHT (Responsive Grid) */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1.5fr,1fr] gap-10 lg:gap-16 mb-24 items-start">
+        {/* 2. COVER IMAGE LEFT, PROBLEM/SOLUTION RIGHT */}
+        {/* FIX 2: Changed to lg:grid-cols-2 for an exact 50/50 split on laptop view */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 mb-24 items-start">
             
-            {/* Image resizes naturally without cropping */}
+            {/* Image on the left (order-1) */}
             <div className="w-full rounded-[2rem] overflow-hidden border border-zinc-800 bg-zinc-900 order-1">
               {project.imageUrl ? (
                 <img src={project.imageUrl} alt={project.title} className="w-full h-auto block" />
@@ -43,20 +51,38 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
               )}
             </div>
 
-            {/* Problem / Solution Text Box */}
+            {/* Problem / Solution Text Box on the right (order-2) */}
             <div className="flex flex-col gap-8 order-2">
+                
+                {/* FIX 3: Restored the former look with Icons and Hover Effects */}
                 {project.problemSolved && (
-                  <div className="bg-zinc-900/40 p-6 sm:p-8 rounded-3xl border border-zinc-800">
-                    <h3 className="text-2xl font-bold text-white mb-4 border-b border-zinc-800 pb-3">The Problem</h3>
-                    <p className="text-zinc-400 leading-relaxed whitespace-pre-wrap text-sm sm:text-base">{project.problemSolved}</p>
+                  <div className="flex items-start gap-5 p-6 sm:p-8 bg-zinc-900/60 border border-zinc-800 rounded-3xl transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(4,82,218,0.15)] hover:border-benfic-blue cursor-default">
+                    <div className="text-2xl sm:text-3xl bg-zinc-950 border border-zinc-800 text-benfic-blue p-4 rounded-full flex-shrink-0 shadow-inner">
+                        ⚠️
+                    </div>
+                    <div>
+                        <h3 className="text-2xl font-bold text-white mb-3">The Problem</h3>
+                        <p className="text-zinc-400 leading-relaxed whitespace-pre-wrap text-sm sm:text-base">
+                            {project.problemSolved}
+                        </p>
+                    </div>
                   </div>
                 )}
+                
                 {project.solutionText && (
-                  <div className="bg-zinc-900/40 p-6 sm:p-8 rounded-3xl border border-zinc-800">
-                    <h3 className="text-2xl font-bold text-white mb-4 border-b border-zinc-800 pb-3">The Solution</h3>
-                    <p className="text-zinc-400 leading-relaxed whitespace-pre-wrap text-sm sm:text-base">{project.solutionText}</p>
+                  <div className="flex items-start gap-5 p-6 sm:p-8 bg-zinc-900/60 border border-zinc-800 rounded-3xl transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(4,82,218,0.15)] hover:border-benfic-blue cursor-default">
+                    <div className="text-2xl sm:text-3xl bg-zinc-950 border border-zinc-800 text-benfic-blue p-4 rounded-full flex-shrink-0 shadow-inner">
+                        💡
+                    </div>
+                    <div>
+                        <h3 className="text-2xl font-bold text-white mb-3">The Solution</h3>
+                        <p className="text-zinc-400 leading-relaxed whitespace-pre-wrap text-sm sm:text-base">
+                            {project.solutionText}
+                        </p>
+                    </div>
                   </div>
                 )}
+
                 {!project.problemSolved && !project.solutionText && (
                   <div className="p-8 text-zinc-600 italic border border-zinc-800 border-dashed rounded-3xl text-center">No case study details provided.</div>
                 )}

@@ -6,6 +6,9 @@ import Project from "../models/Project";
 import Profile from "../models/Profile"; 
 import CategoryConfig from "../models/CategoryConfig";
 
+// Forces Next.js to fetch fresh data from the database
+export const revalidate = 0;
+
 export default async function Home() {
   await connectToDatabase();
 
@@ -140,9 +143,11 @@ export default async function Home() {
       </section>
 
       {/* 3. FEATURED PORTFOLIO (Category Cards) */}
-      <section id="portfolio" className="py-24 z-10 relative">
-        <div className="px-6 lg:px-8 max-w-7xl mx-auto w-full">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6 text-center md:text-left">
+      <section id="portfolio" className="py-24 px-6 lg:px-8 max-w-7xl mx-auto w-full z-10 relative">
+        <div className="bg-zinc-900/40 backdrop-blur-md rounded-[2rem] border border-zinc-800 p-8 md:p-16 shadow-[0_0_50px_rgba(0,0,0,0.5)] relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-64 h-64 bg-benfic-blue/20 rounded-full filter blur-[80px] -translate-y-1/2 -translate-x-1/2"></div>
+          
+          <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6 text-center md:text-left">
             <div>
               <h2 className="text-sm font-bold tracking-widest text-benfic-blue uppercase mb-4">Our Work</h2>
               <h3 className="text-4xl md:text-5xl font-black text-white">
@@ -154,7 +159,7 @@ export default async function Home() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+          <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 gap-8">
             {displayCategories.map((category) => (
               <Link 
                 href={`/portfolio/category/${category.slug}`} 
@@ -193,8 +198,9 @@ export default async function Home() {
 
       {/* 4. CONTACT SECTION */}
       <section id="contact" className="py-24 px-6 lg:px-8 max-w-7xl mx-auto w-full z-10 relative">
-        <div className="bg-zinc-900/30 border border-zinc-800 rounded-3xl p-8 lg:p-16">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+        <div className="bg-zinc-900/30 border border-zinc-800 rounded-[2rem] p-8 md:p-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
+            
             <div className="text-center lg:text-left">
               <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
                 Let's Build Something <span className="text-benfic-blue">Incredible.</span>
@@ -214,9 +220,11 @@ export default async function Home() {
               </a>
             </div>
             
-            <div className="bg-zinc-950 rounded-2xl p-6 border border-zinc-800">
+            {/* Double border wrapper removed. ContactForm sits cleanly inside the grid column now. */}
+            <div className="w-full">
                 <ContactForm />
             </div>
+            
           </div>
         </div>
       </section>

@@ -418,7 +418,8 @@ export default function AdminDashboard() {
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl">
             <h2 className="text-3xl font-bold mb-8">Site Configuration & Dynanmic Bio</h2>
             
-            <form onSubmit={handleProfileUpdate} className="bg-zinc-900 border border-zinc-800 p-8 rounded-3xl mb-12 space-y-6">
+            {/* Form 1 - Changed p-8 to p-6 sm:p-8 for better mobile spacing */}
+            <form onSubmit={handleProfileUpdate} className="bg-zinc-900 border border-zinc-800 p-6 sm:p-8 rounded-3xl mb-12 space-y-6">
                 <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 pb-6 border-b border-zinc-800 text-center sm:text-left">
                   <div className="w-24 h-24 rounded-full bg-zinc-800 border-2 border-benfic-blue overflow-hidden flex-shrink-0">
                     {profileData?.profileImageUrl ? (
@@ -445,12 +446,14 @@ export default function AdminDashboard() {
                     <p className="text-zinc-600 text-xs mt-1.5">This detailed bio appears exclusively on the /about page.</p>
                 </div>
 
-                <button type="submit" disabled={isUpdatingProfile} className="w-full sm:w-auto px-8 py-3.5 bg-benfic-blue text-white rounded-xl font-bold hover:bg-blue-600 disabled:bg-zinc-700 disabled:text-zinc-400 transition-colors">
+                {/* Applied h-auto, whitespace-normal, break-words to fix cramped text, set rounded-2xl */}
+                <button type="submit" disabled={isUpdatingProfile} className="w-full sm:w-auto px-8 py-4 h-auto whitespace-normal break-words bg-benfic-blue text-white rounded-2xl font-bold hover:bg-blue-600 disabled:bg-zinc-700 disabled:text-zinc-400 transition-colors">
                     {isUpdatingProfile ? "Uploading Bio..." : "Save Bio Settings"}
                 </button>
             </form>
 
-            <form onSubmit={handleConfigsUpdate} className="bg-zinc-900 border border-zinc-800 p-8 rounded-3xl space-y-10">
+            {/* Form 2 - Changed p-8 to p-6 sm:p-8 for better mobile spacing */}
+            <form onSubmit={handleConfigsUpdate} className="bg-zinc-900 border border-zinc-800 p-6 sm:p-8 rounded-3xl space-y-10">
                 <h3 className="text-xl font-bold text-white pb-6 border-b border-zinc-800">Dynamic Portfolio Category Cover Pages</h3>
                 <p className="text-zinc-400 text-sm">Set the featured images and short description (cover page) for each of your four main project sections.</p>
 
@@ -477,7 +480,7 @@ export default function AdminDashboard() {
                                     setCategoryConfigs(newConfigs);
                                 }}
                                 rows={3} 
-                                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 resize-none" 
+                                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3.5 resize-none" 
                                 required 
                                 placeholder="Explaining what Benfic offers in this section (cover description)..."
                             />
@@ -485,7 +488,8 @@ export default function AdminDashboard() {
                     </div>
                 ))}
 
-                <button type="submit" disabled={isUpdatingConfigs} className="w-full py-4 bg-zinc-800 text-white rounded-xl font-bold hover:bg-benfic-blue transition-colors disabled:bg-zinc-700">
+                {/* Fixed the Grey button! Changed to benfic-blue, added h-auto, whitespace-normal, and break-words */}
+                <button type="submit" disabled={isUpdatingConfigs} className="w-full py-4 h-auto whitespace-normal break-words bg-benfic-blue text-white rounded-2xl font-bold hover:bg-blue-600 transition-colors disabled:bg-zinc-700 disabled:text-zinc-400">
                     {isUpdatingConfigs ? "Uploading Configurations..." : "Save Portfolio Cover Page Settings"}
                 </button>
             </form>

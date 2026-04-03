@@ -2,6 +2,9 @@ import Link from "next/link";
 import connectToDatabase from "../../lib/mongodb";
 import CategoryConfig from "../../models/CategoryConfig";
 
+// Forces Next.js to fetch fresh data from the database, fixing the missing images issue
+export const revalidate = 0;
+
 export default async function PortfolioPage() {
   await connectToDatabase();
   
