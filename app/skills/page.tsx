@@ -1,13 +1,46 @@
 import PageHero from "../../components/PageHero";
+// NEW: Importing the same professional icons from Lucide to match the Home page
+import { Paintbrush, MonitorSmartphone, Palette, Cpu, Layers, Code2 } from "lucide-react";
 
 export default function SkillsPage() {
+  // FIX: Replaced emoji strings with Lucide React components, sized perfectly for the larger circles
   const skills = [
-    { id: "graphics", title: "Graphics Design / Brand Identity", desc: "Crafting memorable visual identities that speak volumes. From striking logo designs to comprehensive brand guidelines...", icon: "🎨" },
-    { id: "wordpress", title: "Wordpress Development", desc: "Building dynamic, high-converting eCommerce platforms and business sites using WordPress...", icon: "💻" },
-    { id: "ui-ux", title: "UI/UX Design", desc: "Designing intuitive, user-centric interfaces. I wireframe and prototype digital experiences...", icon: "✨" },
-    { id: "react", title: "Next.js / React", desc: "Architecting modern, scalable, and SEO-friendly web applications...", icon: "⚛️" },
-    { id: "tailwind", title: "Tailwind CSS", desc: "Translating complex UI designs into flawless, responsive code using utility-first CSS...", icon: "🌊" },
-    { id: "web-dev", title: "Web Development", desc: "Full-cycle development handling both the front-end visual structure and the foundational logic...", icon: "⚙️" },
+    { 
+      id: "graphics", 
+      title: "Graphics Design / Brand Identity", 
+      desc: "Crafting memorable visual identities that speak volumes. From striking logo designs to comprehensive brand guidelines...", 
+      icon: <Paintbrush className="w-8 h-8 sm:w-10 sm:h-10 text-zinc-400 group-hover:text-benfic-blue transition-colors" /> 
+    },
+    { 
+      id: "wordpress", 
+      title: "Wordpress Development", 
+      desc: "Building dynamic, high-converting eCommerce platforms and business sites using WordPress...", 
+      icon: <MonitorSmartphone className="w-8 h-8 sm:w-10 sm:h-10 text-zinc-400 group-hover:text-benfic-blue transition-colors" /> 
+    },
+    { 
+      id: "ui-ux", 
+      title: "UI/UX Design", 
+      desc: "Designing intuitive, user-centric interfaces. I wireframe and prototype digital experiences...", 
+      icon: <Palette className="w-8 h-8 sm:w-10 sm:h-10 text-zinc-400 group-hover:text-benfic-blue transition-colors" /> 
+    },
+    { 
+      id: "react", 
+      title: "Next.js / React", 
+      desc: "Architecting modern, scalable, and SEO-friendly web applications...", 
+      icon: <Cpu className="w-8 h-8 sm:w-10 sm:h-10 text-zinc-400 group-hover:text-benfic-blue transition-colors" /> 
+    },
+    { 
+      id: "tailwind", 
+      title: "Tailwind CSS", 
+      desc: "Translating complex UI designs into flawless, responsive code using utility-first CSS...", 
+      icon: <Layers className="w-8 h-8 sm:w-10 sm:h-10 text-zinc-400 group-hover:text-benfic-blue transition-colors" /> 
+    },
+    { 
+      id: "web-dev", 
+      title: "Web Development", 
+      desc: "Full-cycle development handling both the front-end visual structure and the foundational logic...", 
+      icon: <Code2 className="w-8 h-8 sm:w-10 sm:h-10 text-zinc-400 group-hover:text-benfic-blue transition-colors" /> 
+    },
   ];
 
   return (
@@ -26,7 +59,8 @@ export default function SkillsPage() {
         <div className="flex flex-col gap-8">
           {skills.map((skill, index) => (
             <div key={index} id={skill.id} className="scroll-mt-32 flex flex-col md:flex-row items-center md:items-start gap-8 bg-zinc-950/50 backdrop-blur-sm border border-zinc-800/50 rounded-3xl p-6 sm:p-8 hover:border-benfic-blue hover:shadow-[0_0_30px_rgba(4,82,218,0.1)] transition-all group">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-full bg-zinc-900 border border-zinc-700 flex items-center justify-center text-2xl sm:text-3xl group-hover:bg-benfic-blue/20 group-hover:border-benfic-blue transition-all duration-500 group-hover:scale-110">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-full bg-zinc-900 border border-zinc-700 flex items-center justify-center group-hover:bg-benfic-blue/20 group-hover:border-benfic-blue transition-all duration-500 group-hover:scale-110">
+                {/* Renders the Lucide SVG icon */}
                 {skill.icon}
               </div>
               <div className="flex-1 text-center md:text-left">

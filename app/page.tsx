@@ -6,7 +6,9 @@ import Project from "../models/Project";
 import Profile from "../models/Profile"; 
 import CategoryConfig from "../models/CategoryConfig";
 
-// Forces Next.js to fetch fresh data from the database
+// NEW: Importing professional icons from Lucide
+import { Paintbrush, Code2, Cpu, Layers, Palette, MonitorSmartphone } from "lucide-react";
+
 export const revalidate = 0;
 
 export default async function Home() {
@@ -15,10 +17,8 @@ export default async function Home() {
   const profile = await Profile.findOne({}).lean();
   const bioExcerpt = profile?.bioExcerpt || "I am a multi-disciplinary creative specialist dedicated to bridging the gap between visual design and technical execution. I generate designs that speak louder than words and sell your services effectively.";
 
-  // Dynamic Stats: Count total projects in DB
   const totalProjects = await Project.countDocuments();
 
-  // Fetch Category Configs for the Home Page Portfolio Section
   const categoryConfigsRaw = await CategoryConfig.find({}).lean();
   const categoriesToFeature = [
     { name: "Graphic Design", slug: "graphic-design" },
@@ -37,13 +37,14 @@ export default async function Home() {
     };
   });
 
+  // FIX: Replaced emojis with Lucide React components
   const skillsData = [
-    { id: "graphics", title: "Graphics Design / Brand Identity", icon: "🎨" },
-    { id: "web-dev", title: "Web Development", icon: "⚙️" },
-    { id: "react", title: "Next.js / React", icon: "⚛️" },
-    { id: "tailwind", title: "Tailwind CSS", icon: "🌊" },
-    { id: "ui-ux", title: "UI/UX Design", icon: "✨" },
-    { id: "wordpress", title: "Wordpress Development", icon: "💻" }
+    { id: "graphics", title: "Graphics Design / Brand Identity", icon: <Paintbrush className="w-5 h-5" /> },
+    { id: "web-dev", title: "Web Development", icon: <Code2 className="w-5 h-5" /> },
+    { id: "react", title: "Next.js / React", icon: <Cpu className="w-5 h-5" /> },
+    { id: "tailwind", title: "Tailwind CSS", icon: <Layers className="w-5 h-5" /> },
+    { id: "ui-ux", title: "UI/UX Design", icon: <Palette className="w-5 h-5" /> },
+    { id: "wordpress", title: "Wordpress Development", icon: <MonitorSmartphone className="w-5 h-5" /> }
   ];
 
   return (
@@ -63,8 +64,8 @@ export default async function Home() {
       <section className="relative flex min-h-[calc(100vh-80px)] flex-col items-center justify-center px-6 z-10 pt-10">
         <div className="text-center w-full max-w-5xl mx-auto flex flex-col items-center">
           
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-zinc-800 bg-zinc-900/50 backdrop-blur-md mb-8 shadow-[0_0_15px_rgba(4,82,218,0.2)]">
-            <span className="text-xl">🚀</span>
+          {/* FIX: Removed the rocket icon and adjusted padding to keep it centered */}
+          <div className="inline-flex items-center px-6 py-2 rounded-full border border-zinc-800 bg-zinc-900/50 backdrop-blur-md mb-8 shadow-[0_0_15px_rgba(4,82,218,0.2)]">
             <span className="text-sm font-medium text-blue-200 tracking-wide">Premium Creative Studio</span>
           </div>
 
@@ -85,7 +86,6 @@ export default async function Home() {
             </a>
           </div>
 
-          {/* Flashy Glassmorphism Stats Row */}
           <div className="mt-20 w-full max-w-3xl bg-zinc-900/30 backdrop-blur-xl border border-zinc-800/50 rounded-3xl p-8 sm:p-12 shadow-[0_0_40px_rgba(0,0,0,0.5)]">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
                <div className="flex flex-col items-center">
@@ -124,11 +124,11 @@ export default async function Home() {
                 "{bioExcerpt}"
               </p>
               
-              {/* Rounded Skills with Icons */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {skillsData.map((skill) => (
                   <Link href={`/skills#${skill.id}`} key={skill.id} className="flex items-center gap-3 p-4 rounded-2xl border border-zinc-700 bg-zinc-950/50 hover:bg-zinc-900 hover:border-benfic-blue transition-all group cursor-pointer">
-                    <div className="w-10 h-10 shrink-0 rounded-full bg-zinc-800 flex items-center justify-center text-lg group-hover:bg-benfic-blue/20 group-hover:text-benfic-blue transition-colors">
+                    <div className="w-10 h-10 shrink-0 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 group-hover:bg-benfic-blue/20 group-hover:text-benfic-blue transition-colors">
+                      {/* FIX: Renders the Lucide icon perfectly */}
                       {skill.icon}
                     </div>
                     <span className="text-sm font-semibold text-zinc-300 group-hover:text-white transition-colors">
@@ -142,7 +142,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 3. FEATURED PORTFOLIO (Category Cards) */}
+      {/* 3. FEATURED PORTFOLIO */}
       <section id="portfolio" className="py-24 px-6 lg:px-8 max-w-7xl mx-auto w-full z-10 relative">
         <div className="bg-zinc-900/40 backdrop-blur-md rounded-[2rem] border border-zinc-800 p-8 md:p-16 shadow-[0_0_50px_rgba(0,0,0,0.5)] relative overflow-hidden">
           <div className="absolute top-0 left-0 w-64 h-64 bg-benfic-blue/20 rounded-full filter blur-[80px] -translate-y-1/2 -translate-x-1/2"></div>
@@ -220,7 +220,6 @@ export default async function Home() {
               </a>
             </div>
             
-            {/* Double border wrapper removed. ContactForm sits cleanly inside the grid column now. */}
             <div className="w-full">
                 <ContactForm />
             </div>
