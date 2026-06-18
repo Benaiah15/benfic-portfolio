@@ -35,7 +35,7 @@ export default async function CategoryPage({
         <div className="text-center">
             <h1 className="text-5xl font-black text-benfic-blue mb-4">404</h1>
             <h2 className="text-2xl font-bold">Category Not Found</h2>
-            <Link href="/portfolio" className="mt-6 inline-block text-zinc-400 hover:text-white transition-colors">← Back to Portfolio</Link>
+            <Link prefetch={false} href="/portfolio" className="mt-6 inline-block text-zinc-400 hover:text-white transition-colors">← Back to Portfolio</Link>
         </div>
       </div>
     );
@@ -97,7 +97,7 @@ export default async function CategoryPage({
             <h2 className="text-2xl font-bold text-white">
                 {currentFilter === "All" ? "All Projects" : currentFilter} <span className="text-zinc-500 text-lg font-medium">({projects.length})</span>
             </h2>
-            <Link href="/portfolio" className="text-sm font-bold text-benfic-blue hover:text-white transition-colors">
+            <Link prefetch={false} href="/portfolio" className="text-sm font-bold text-benfic-blue hover:text-white transition-colors">
                 ← Back to Categories
             </Link>
         </div>

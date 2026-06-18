@@ -21,7 +21,7 @@ export default function Navbar() {
           
           {/* Logo Section */}
           <div className="flex-shrink-0">
-            <Link href="/" className="flex items-center gap-3">
+            <Link prefetch={false} href="/" className="flex items-center gap-3">
               <div className="relative flex items-center justify-center w-11 h-11 rounded-full bg-white overflow-hidden border-[1.5px] border-white">
                 <Image 
                   src="/logo.png" 

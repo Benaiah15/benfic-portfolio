@@ -113,7 +113,7 @@ export default async function Home() {
                 Bridging<br/>
                 <span className="text-zinc-400">Design & Code.</span>
               </h3>
-              <Link href="/about" className="inline-flex items-center gap-2 text-sm font-bold text-benfic-blue hover:text-white transition-colors uppercase tracking-wider group">
+              <Link prefetch={false} href="/about" className="inline-flex items-center gap-2 text-sm font-bold text-benfic-blue hover:text-white transition-colors uppercase tracking-wider group">
                 Read Full Story 
                 <span className="group-hover:translate-x-2 transition-transform">→</span>
               </Link>
@@ -126,7 +126,7 @@ export default async function Home() {
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {skillsData.map((skill) => (
-                  <Link href={`/skills#${skill.id}`} key={skill.id} className="flex items-center gap-3 p-4 rounded-2xl border border-zinc-700 bg-zinc-950/50 hover:bg-zinc-900 hover:border-benfic-blue transition-all group cursor-pointer">
+                  <Link prefetch={false} href={`/skills#${skill.id}`} key={skill.id} className="flex items-center gap-3 p-4 rounded-2xl border border-zinc-700 bg-zinc-950/50 hover:bg-zinc-900 hover:border-benfic-blue transition-all group cursor-pointer">
                     <div className="w-10 h-10 shrink-0 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 group-hover:bg-benfic-blue/20 group-hover:text-benfic-blue transition-colors">
                       {/* FIX: Renders the Lucide icon perfectly */}
                       {skill.icon}
@@ -154,7 +154,7 @@ export default async function Home() {
                 Featured <span className="text-benfic-blue">Portfolio</span>
               </h3>
             </div>
-            <Link href="/portfolio" className="text-sm font-bold text-zinc-400 hover:text-white transition-colors border-b border-zinc-700 hover:border-white pb-1 inline-block mx-auto md:mx-0">
+            <Link prefetch={false} href="/portfolio" className="text-sm font-bold text-zinc-400 hover:text-white transition-colors border-b border-zinc-700 hover:border-white pb-1 inline-block mx-auto md:mx-0">
               Explore All Works
             </Link>
           </div>
